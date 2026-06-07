@@ -12,45 +12,46 @@ const USER = "pontes.tatianesol";
 const PASS_HASH = "30a7fc9ecc375787c8ab8a3350fd70018d9a60ed15f20271abef252b99f3bce1";
 
 async function getSession() {
-    const jar = new CookieJar();
-    const client = wrapper(axios.create({ 
-        jar: jar, 
-        withCredentials: true 
-    }));
-
-    const data = new URLSearchParams({
-        "usuario": USER,
-        "senha": "",
-        "senha_256": PASS_HASH,
-        "etapa": "ACESSO",
-        "logout": ""
-    });
-
     try {
+        const jar = new CookieJar();
+        const client = wrapper(axios.create({ 
+            jar, 
+            withCredentials: true 
+        }));
+
+        const data = new URLSearchParams({
+            "usuario": USER,
+            "senha": "",
+            "senha_256": PASS_HASH,
+            "etapa": "ACESSO",
+            "logout": ""
+        });
+
+        // Tentativa de Login
         await client.post(LOGIN_URL, data.toString(), {
             timeout: 15000,
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         });
 
+        // Validando sessão
         await client.get("https://sisregiii.saude.gov.br/cgi-bin/cadweb50?standalone=1", { timeout: 15000 });
+        
         return client;
     } catch (error) {
-        console.error("Erro ao obter sessão:", error.message);
-        throw error;
+        throw new Error(`Erro na Sessão: ${error.message}`);
     }
 }
 
 function extrairDados(html) {
-    const $ = cheerio.load(html);
-    const dados = { pessoais: {}, documentos: {}, endereco: {}, contatos: [], cadastro: {} };
-    const trs = $("tr").get();
-
     try {
+        const $ = cheerio.load(html);
+        const dados = { pessoais: {}, documentos: {}, endereco: {}, contatos: [], cadastro: {} };
+        const trs = $("tr").get();
+
         for (let i = 0; i < trs.length; i++) {
             const tr = $(trs[i]);
             const texto = tr.text().replace(/\s+/g, ' ').trim();
-            const getNextRowCols = () => (i + 1 >= trs.length) ? [] : $(trs[i + 1]).find("td").get();
-            const nextCols = getNextRowCols();
+            const nextCols = (i + 1 >= trs.length) ? [] : $(trs[i + 1]).find("td").get();
 
             if (texto.includes("CNS:") && nextCols.length > 0) dados.pessoais.cns = $(nextCols[0]).text().trim();
             else if (texto.includes("Nome:") && texto.includes("Nome Social") && nextCols.length >= 2) {
@@ -122,46 +123,55 @@ function extrairDados(html) {
         const atualizacaoMatch = bodyText.match(/Ultima atualizacao junto ao CADWEB:\s*([0-9/]+\s*@\s*[0-9:]+)/);
         if (atualizacaoMatch) dados.cadastro.ultima_atualizacao = atualizacaoMatch[1];
 
+        return dados;
     } catch (e) {
-        console.error("ERRO PARSER:", e);
+        throw new Error(`Erro no Parser: ${e.message}`);
     }
-    return dados;
 }
 
 app.get("/consulta-cpf", async (req, res) => {
-    const cpfRaw = req.query.cpf;
-    if (!cpfRaw) return res.status(400).json({ erro: "CPF não informado" });
-
-    const cpfClean = cpfRaw.replace(/\D/g, "");
-    if (cpfClean.length !== 11) return res.status(400).json({ erro: "CPF inválido" });
-
     try {
+        const cpfRaw = req.query.cpf;
+        if (!cpfRaw) return res.status(400).json({ erro: "CPF não informado" });
+
+        const cpfClean = cpfRaw.replace(/\D/g, "");
+        if (cpfClean.length !== 11) return res.status(400).json({ erro: "CPF inválido" });
+
+        // 1. Obtendo Sessão
         const sess = await getSession();
+        
+        // 2. Montando Payload
         const payload = new URLSearchParams({
             "nu_cns": cpfClean, "nome_paciente": "", "nome_mae": "", "dt_nascimento": "",
             "uf_nasc": "", "mun_nasc": "", "uf_res": "", "mun_res": "", "sexo": "",
             "etapa": "DETALHAR", "url": "", "standalone": "1"
         });
 
+        // 3. Fazendo a Requisição Final
         const response = await sess.post(CADWEB_URL + "?standalone=1", payload.toString(), {
             headers: {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                 "Origin": "https://sisregiii.saude.gov.br",
                 "Referer": "https://sisregiii.saude.gov.br/cgi-bin/cadweb50?standalone=1",
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            timeout: 30000
+            timeout: 25000
         });
 
         const html = response.data;
         if (html.includes("Erro de sincronizacao")) return res.status(500).json({ erro: "Erro de sincronização do SISREG" });
-        if (!html.includes("CONSULTA AO CADASTRO")) return res.status(500).json({ erro: "Página inesperada" });
+        if (!html.includes("CONSULTA AO CADASTRO")) return res.status(500).json({ erro: "Paciente não encontrado ou página inesperada" });
 
         return res.json(extrairDados(html));
+
     } catch (error) {
-        return res.status(500).json({ erro: error.message });
+        // AQUI ESTÁ O SEGREDO: Ele vai devolver o erro real na tela do navegador
+        return res.status(500).json({ 
+            erro: "Falha na execução", 
+            detalhes: error.message,
+            stack: error.stack 
+        });
     }
 });
 
-// ESSENCIAL PARA VERCEL:
 module.exports = app;
