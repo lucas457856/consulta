@@ -1,26 +1,31 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const { wrapper } = require('axios-cookiejar-support');
-const { CookieJar } = require('tough-cookie');
 
 const LOGIN_URL = "https://sisregiii.saude.gov.br/";
 const CADWEB_URL = "https://sisregiii.saude.gov.br/cgi-bin/cadweb50";
 const USER = "pontes.tatianesol";
 const PASS_HASH = "30a7fc9ecc375787c8ab8a3350fd70018d9a60ed15f20271abef252b99f3bce1";
 
-async function getSession() {
-    const jar = new CookieJar();
-    const client = wrapper(axios.create({ jar, withCredentials: true }));
+async function getSessionCookie() {
     const data = new URLSearchParams({
-        "usuario": USER, "senha": "", "senha_256": PASS_HASH, "etapa": "ACESSO", "logout": ""
+        "usuario": USER,
+        "senha": "",
+        "senha_256": PASS_HASH,
+        "etapa": "ACESSO",
+        "logout": ""
     });
 
-    await client.post(LOGIN_URL, data.toString(), {
-        timeout: 15000,
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    // Faz o login e captura os cookies do cabeçalho 'set-cookie'
+    const response = await axios.post(LOGIN_URL, data.toString(), {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        timeout: 15000
     });
-    await client.get("https://sisregiii.saude.gov.br/cgi-bin/cadweb50?standalone=1", { timeout: 15000 });
-    return client;
+
+    const cookies = response.headers['set-cookie'];
+    if (!cookies) throw new Error("Não foi possível obter cookies de sessão");
+    
+    // Retorna os cookies formatados para serem usados no próximo header
+    return cookies.join('; ');
 }
 
 function extrairDados(html) {
@@ -106,46 +111,40 @@ function extrairDados(html) {
     return dados;
 }
 
-// EXPORTAÇÃO PADRÃO DA VERCEL (Sem Express)
 module.exports = async (req, res) => {
     try {
         const cpfRaw = req.query.cpf;
-        if (!cpfRaw) {
-            return res.status(400).json({ erro: "CPF não informado" });
-        }
+        if (!cpfRaw) return res.status(400).json({ erro: "CPF não informado" });
 
         const cpfClean = cpfRaw.replace(/\D/g, "");
-        if (cpfClean.length !== 11) {
-            return res.status(400).json({ erro: "CPF inválido" });
-        }
+        if (cpfClean.length !== 11) return res.status(400).json({ erro: "CPF inválido" });
 
-        const sess = await getSession();
+        // 1. Pega o Cookie de Login
+        const cookie = await getSessionCookie();
+        
+        // 2. Prepara a requisição de detalhe
         const payload = new URLSearchParams({
             "nu_cns": cpfClean, "nome_paciente": "", "nome_mae": "", "dt_nascimento": "",
             "uf_nasc": "", "mun_nasc": "", "uf_res": "", "mun_res": "", "sexo": "",
             "etapa": "DETALHAR", "url": "", "standalone": "1"
         });
 
-        const response = await sess.post(CADWEB_URL + "?standalone=1", payload.toString(), {
+        const response = await axios.post(CADWEB_URL + "?standalone=1", payload.toString(), {
             headers: {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Cookie": cookie,
                 "Origin": "https://sisregiii.saude.gov.br",
                 "Referer": "https://sisregiii.saude.gov.br/cgi-bin/cadweb50?standalone=1",
                 "Content-Type": "application/x-www-form-urlencoded"
             },
-            timeout: 25000
+            timeout: 20000
         });
 
         const html = response.data;
-        if (html.includes("Erro de sincronizacao")) {
-            return res.status(500).json({ erro: "Erro de sincronização do SISREG" });
-        }
-        if (!html.includes("CONSULTA AO CADASTRO")) {
-            return res.status(500).json({ erro: "Paciente não encontrado ou página inesperada" });
-        }
+        if (html.includes("Erro de sincronizacao")) return res.status(500).json({ erro: "Erro de sincronização do SISREG" });
+        if (!html.includes("CONSULTA AO CADASTRO")) return res.status(500).json({ erro: "Paciente não encontrado ou página inesperada" });
 
-        const resultado = extrairDados(html);
-        return res.status(200).json(resultado);
+        return res.status(200).json(extrairDados(html));
 
     } catch (error) {
         return res.status(500).json({ 
