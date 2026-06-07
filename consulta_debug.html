@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<!-- SISREG III v3.4 -->
+<!-- Modulo: cadweb50.c -->
+<!-- Timestamp: Jun  3 2026 (20:02:18) -->
+<!-- Revisao: 2026.06 (MCK2)-->
+
+<!-- Revisao libcadsus: 2026.06 -->
+<!-- Revisao libacesso: 2026.06 -->
+<!-- Revisao libmenucache: 2026.06 -->
+<!-- Revisao libsisregconfig: 2026.06 -->
+
+<HTML xmlns="http://www.w3.org/1999/xhtml" lang="pt" xml:lang="pt-br" >
+	<HEAD>
+		<TITLE>SISREG III</TITLE>
+		<META http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<META http-equiv="Content-Language" content="pt-BR" />
+		<LINK rel="stylesheet" href="/css/estilo.css"    type="text/css">
+		<LINK rel="stylesheet" href="/css/layout.css"    type="text/css" media="screen" charset="utf-8"/>
+		<LINK rel="stylesheet" href="/css/form.css"      type="text/css" media="screen" charset="utf-8"/>
+		<LINK rel="stylesheet" href="/css/jquery-ui-1.12.1.min.css" type="text/css" media="screen" charset="utf-8"/>
+		<SCRIPT type="text/javascript" src="/javascript/jquery-3.6.0.min.js" charset="utf-8"></SCRIPT>
+		<SCRIPT type="text/javascript" src="/javascript/jquery-ui-1.12.1.min.js"></SCRIPT>
+               <SCRIPT type="text/javascript" src="/javascript/jquery.mask.min.js"></SCRIPT>
+		<SCRIPT type="text/javascript" src="/javascript/datepicker.js"></SCRIPT>
+		<SCRIPT type="text/javascript" src="/javascript/ajax.js"></SCRIPT>
+		<SCRIPT type="text/javascript" src="/javascript/CheckDate.js"></SCRIPT>
+		<SCRIPT type="text/javascript" src="/javascript/cns.js"></SCRIPT>
+		<SCRIPT type="text/javascript" src="/javascript/common.js"></SCRIPT>
+		<SCRIPT type="text/javascript" src="/javascript/sisreg_ajax_popup.js"></SCRIPT>
+
+		<SCRIPT LANGUAGE='JavaScript'>
+
+	var frm = null;
+
+	function initialize()
+	{
+		frm = document.form;
+
+		exibirDivPrincipal();
+	}
+
+	function exibirDivPrincipal()
+	{
+		document.getElementById('progress_div').style.display = 'none';
+		document.getElementById('main_div').style.display = '';
+	}
+
+	<!-- URL: /cgi-bin/cadweb50?etapa=DETALHAR&standalone=1&nu_cns=58544470963 => L2NnaS1iaW4vY2Fkd2ViNTA/ZXRhcGE9REVUQUxIQVImc3RhbmRhbG9uZT0xJm51X2Nucz01ODU0NDQ3MDk2Mw== -->
+
+	function cadwebInclusaoEdicao( cns )
+	{
+		var url = 'https://cadastro.saude.gov.br/cadsusweb/faces/cadastroUsuariosSus.xhtml';
+
+		url = url + '?NM_BT_RETORNO=Voltar para o SISREG';
+
+		if( cns.length > 0 )
+			url = url + '&usuarioSelecionado=' + cns;
+
+		url = url + '&URL_INTEGRACAO_RETORNO=http://sisregiii.saude.gov.br/cgi-bin/index?frmencurl=L2NnaS1iaW4vY2Fkd2ViNTA/ZXRhcGE9REVUQUxIQVImc3RhbmRhbG9uZT0xJm51X2Nucz01ODU0NDQ3MDk2Mw==';
+
+		window.open( url, '_top' );
+	}
+
+		function cadwebConsulta()
+		{
+			var url = 'https://cadastro.saude.gov.br/cadsusweb/faces/consultaCadastroUsuariosSus.xhtml';
+
+			url = url + '?NM_BT_RETORNO=Voltar para o SISREG';
+			url = url + '&URL_INTEGRACAO_RETORNO=http://sisregiii.saude.gov.br/cgi-bin/index?frmencurl=L2NnaS1iaW4vY2Fkd2ViNTA/ZXRhcGE9REVUQUxIQVImc3RhbmRhbG9uZT0xJm51X2Nucz01ODU0NDQ3MDk2Mw==';
+			window.open( url, '_top' );
+		}
+
+	function continuar( url, cns )
+	{
+		frm.action = url;
+		frm.cns.value = cns;
+		frm.etapa.value = '';
+		frm.url.value = '';
+		frm.submit();
+	}
+
+	function nova_pesquisa()
+	{
+		frm.etapa.value = '';
+		frm.url.value = '';
+		frm.standalone.value = '1';
+		frm.submit();
+	}
+
+		</SCRIPT>
+	</HEAD>
+
+	<BODY link='#0000AA' vlink='#0000AA'>
+
+	<CENTER><h1>CONSULTA AO CADASTRO DE PACIENTES SUS</h1></CENTER>
+
+		<DIV id='progress_div'>
+			<BR><BR>
+			<CENTER><IMG src='/imagens/loading.gif'/></CENTER>
+			<CENTER><SPAN style='font-size: 80%'>Processando...</SPAN></CENTER>
+			<BR><BR>
+		</DIV>
+
+		<DIV id='main_div' style='display: none;'>
+
+		<FORM name='form' method='post'>
+
+<center><table width='75%' class='table_listagem'>
+<tr><td class='td_titulo_tabela' colspan='4'>Dados Pessoais:</td></tr>
+<tr bgcolor='#F3F3F3'><td colspan='4'><b>CNS:</b></td></tr>
+<tr><td colspan='2'><font size='3'><B>705008441667751</B></font>
+</td></tr>
+<tr bgcolor='#F3F3F3'><td colspan='2'><b>Nome:</b></td><td colspan='2'><b>Nome Social / Apelido:</b></td></tr>
+<tr><td colspan='2'>MARILEIA TECHIO DEITOS</td><td colspan='2'>---</td></tr>
+<tr bgcolor='#F3F3F3'><td colspan='2'><b>Nome da M&#227;e:</b></td><td colspan='2'><b>Nome do Pai:</b></td></tr>
+<tr><td colspan='2'>LEONILDA ANA TECHIO</td><td colspan='2'>DANIEL TECHIO</td></tr>
+<tr bgcolor='#F3F3F3'><td colspan='2'><b>Sexo:</b></td><td colspan='2'><b>Ra&#231;a:</b></td></tr>
+<tr><td colspan='2'>FEMININO</td><td colspan='2'>BRANCA</td></tr>
+<tr bgcolor='#F3F3F3'><td colspan='2'><b>Data de Nascimento:</b></td><td colspan='2'><b>Tipo Sangu&#237;neo:</b></td></tr>
+<tr><td colspan='2'>24/05/1970 (56 anos)</td><td colspan='2'>---</td></tr>
+<tr bgcolor='#F3F3F3'><td colspan='2'><b>Nacionalidade:</b></td><td colspan='2'><b>Munic&#237;pio de Nascimento:</b></td></tr>
+<tr><td colspan='2'>BRASILEIRA</td><td colspan='2'>SEARA - SC</td></tr>
+<tr><td class='td_titulo_tabela' colspan='4'>Endere&#231;o:</td></tr>
+<tr bgcolor='#F3F3F3'><td colspan='2'><b>Tipo Logradouro:</b></td><td colspan='2'><b>Logradouro:</b></td></tr>
+<tr><td colspan='2'>CAMPO</td><td colspan='2'>LINHA BONITA</td></tr>
+<tr bgcolor='#F3F3F3'><td colspan='2'><b>Complemento:</b></td><td colspan='2'><b>N&uacute;mero:</b></td></tr>
+<tr><td colspan='2'>CASA</td><td colspan='2'>S/N</td></tr>
+<tr bgcolor='#F3F3F3'><td colspan='2'><b>Bairro:</b></td><td colspan='2'><b>CEP:</b></td></tr>
+<tr><td colspan='2'>LINHA BONITA</td><td colspan='2'> 89770-000</td></tr>
+<tr bgcolor='#F3F3F3'><td colspan='2'><b>Pa&#237;s de Resid&#234;ncia:</b></td><td colspan='2'><b>Munic&#237;pio de Resid&#234;ncia:</b></td></tr>
+<tr><td colspan='2'>BRASIL</td><td colspan='2'>SEARA - SC</td></tr>
+<tr><td class='td_titulo_tabela' colspan='4'>Contatos:</td></tr>
+<tr bgcolor='#F3F3F3'><td colspan='4' align='left'><b>Telefone(s):</b></td></tr>
+<tr><td colspan='4' align='center'>
+	<TABLE class='table_listagem' align='center' width='90%'>
+	<TR>
+		<TD class='td_titulo_campo' colspan='1' align='center' width='50%'>Tipo Telefone</TD>
+		<TD class='td_titulo_campo' colspan='1' align='center' width='20%'>DDD</TD>
+		<TD class='td_titulo_campo' colspan='1' align='center' width='30%'>N&#250;mero</TD>
+	</TR>
+	<TR style='background-color: #FFFFFF;'>
+		<TD align='center'>CELULAR</TD>
+		<TD align='center'>(49)</TD>
+		<TD align='center'>98831-8163</TD>
+	</TR>
+	</TABLE>
+</td></tr>
+<tr><td class='td_titulo_tabela' colspan='4'>Documentos:</td></tr>
+<tr bgcolor='#F3F3F3'><td colspan='4'><b>CPF:</b></tr>
+<tr><td colspan='2'> 585.444.709-63</td></tr>
+<tr bgcolor='#F3F3F3'><td colspan='4' align='left'><b>Identidade:</b></td></tr>
+<TR>
+	<TD colspan='4'>
+	<TABLE class='table_listagem' align='center' width='90%'>
+	<TR>
+		<TD class='td_titulo_campo' colspan='1' align='center' width='25%'>Num. RG</TD>
+		<TD class='td_titulo_campo' colspan='1' align='center' width='25%'>Org&atilde;o Emissor</TD>
+		<TD class='td_titulo_campo' colspan='1' align='center' width='25%'>Estado Emissor</TD>
+		<TD class='td_titulo_campo' colspan='1' align='center' width='25%'>Data de Emiss&atilde;o</TD>
+	</TR>
+	<TR>
+		<TD align='center'>00001874385</TD>
+		<TD align='center'>SSP</TD>
+		<TD align='center'>SC</TD>
+		<TD align='center'>07/11/1996</TD>
+	</TR>
+	</TABLE>
+	</TD>
+</TR>
+</table></center>
+
+<CENTER><DIV style='text-align: right; width: 75%;'>
+	<A HREF='#' onClick="popupListarAgregados('705008441667751');"><IMG src='../imagens/icone-cartao.png' title='Cartoes agregados do usuario.' /></A>
+	<IMG src='../imagens/icone-qualidade.png' title='Grau de qualidade das informacoes: 83%'/>
+	<IMG src='../imagens/icon-info.png' title='Ultima atualizacao junto ao CADWEB: 24/02/2024 @ 11:00:53'/>
+</DIV></CENTER>
+<BR><center>
+<input type='button' name='btn_voltar' value='Voltar' onclick='javascript:history.go(-1)'>&nbsp;
+<input type='button' name='btn_editar' value='Cadastro' onclick="cadwebInclusaoEdicao('705008441667751');">&nbsp;
+<input type='button' name='btn_nova_pesquisa' value='Nova Pesquisa' onclick="nova_pesquisa();">
+</center>
+
+<INPUT type="hidden" name="cns" value="705008441667751"/>
+<INPUT type="hidden" name="etapa" value="DETALHAR"/>
+<INPUT type="hidden" name="url" value=""/>
+<INPUT type="hidden" name="standalone" value="1"/>
+		</FORM>
+
+		</DIV>
+
+	<SCRIPT>initialize();</SCRIPT>
+
+	</BODY>
+</HTML>
+

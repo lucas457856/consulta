@@ -1,0 +1,195 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+
+<!-- SISREG III v3.4 -->
+<!-- Modulo: index.c -->
+<!-- Timestamp: Jun  3 2026 (20:02:17) -->
+<!-- Revisao: 2026.06 (MCK2)-->
+
+<!-- Revisao libcadsus: 2026.06 -->
+<!-- Revisao libacesso: 2026.06 -->
+<!-- Revisao libmenucache: 2026.06 -->
+<!-- Revisao libsisregconfig: 2026.06 -->
+
+<HTML xmlns="http://www.w3.org/1999/xhtml" lang="pt" xml:lang="pt-br" >
+<HEAD>
+	<TITLE>SISREG III - Servidor de Producao</TITLE>
+	<META http-equiv="Content-type" content="text/html; charset=utf-8" />
+	<META name="robots" content="noindex,follow" />
+	<LINK rel="shortcut icon" href="/imagens/datasus-icone.ico"/>
+	<LINK rel="icon" type="image/x-icon" href="/imagens/datasus-icone.ico"/>
+	<LINK rel="stylesheet" href="/css/reset.css" type="text/css" media="all" charset="utf-8" />
+	<LINK rel="stylesheet" href="/css/layout.css" type="text/css" media="all" charset="utf-8" />
+	<LINK rel="stylesheet" href="/css/barra-governo.css" media="all" charset="utf-8" />
+	<LINK rel="stylesheet" href="/css/jquery-ui.css" type="text/css" media="all" charset="utf-8" />
+	<LINK rel="stylesheet" href="/css/form.css" type="text/css" media="all" charset="utf-8" />
+	<LINK rel="stylesheet" href="/css/menu.css" type="text/css" media="all" charset="utf-8" />
+	<SCRIPT src="/javascript/jquery.js" type="text/javascript" language="javascript" charset="utf-8"></SCRIPT>
+	<SCRIPT src="/javascript/jquery-ui.js" type="text/javascript" language="javascript" charset="utf-8"></SCRIPT>
+	<SCRIPT src="/javascript/menu.js" type="text/javascript" language="javascript" charset="utf-8"></SCRIPT>
+	<SCRIPT LANGUAGE="javascript">
+
+var cookie = "998df9f39362d27551982792ccd4b6a048af7d0cae4d3b51f7ff54cf842588cd";
+
+$(function() {
+	$( '#f_main' ).css( 'min-height', $(window).height() - 240 );
+
+	$('#ifrm-barra-brasil').load(function() {
+		$(this).height( $(this).contents().find('html')[0].scrollHeight + 'px' );
+	});
+
+});
+
+function enviar()
+{
+	var frm = document.formLogin;
+
+	if((frm.senha.value != '') && (frm.usuario.value != ''))
+	{
+		frm.senha_256.value = hex_sha256(frm.senha.value.toUpperCase());
+		frm.senha.value = '';
+		frm.submit();
+	}
+}
+
+function logout()
+{
+	var frm = document.formLogin;
+
+	frm.logout.value = "1";
+	frm.submit();
+}
+
+	</SCRIPT>
+</HEAD>
+<BODY>
+    <DIV align="center">
+
+    <DIV id="geral">
+       <iframe id="ifrm-barra-brasil" width="100%" height="0px" src="/barra-brasil.html" security="restricted" sandbox></iframe>
+
+        <DIV id="barraSistemaSup">
+            <span class="sigla" onclick="window.open('/cgi-bin/index', '_top');">SISREG</span>
+            <DIV id="menuRapido">
+                <a class="item" href="/">
+            		<DIV class="icone">
+            			<img src="/imagens/home.png"/>
+            		</DIV>
+            		<DIV class="texto">
+            			<p>Principal</p>
+            		</DIV>
+                </a>
+                <a class="item" href="/cgi-bin/config_perfil" target="f_principal">
+            		<DIV class="icone">
+            			<img src="/imagens/perfil.png"/>
+            		</DIV>
+            		<DIV class="texto">
+            			<p>Perfil</p>
+            		</DIV>
+                </a>
+                <a class="item" href="mailto:?Subject=Suporte T&eacute;cnico SISREG III">
+            		<DIV class="icone">
+            			<img src="/imagens/contato.png"/>
+            		</DIV>
+            		<DIV class="texto">
+            			<p>Contato</p>
+            		</DIV>
+                </a>
+                <a class="item" target="_blank" href="https://wiki.saude.gov.br/SISREG/index.php/P&aacute;gina_principal#Acesso_a_API-_Application_Programming_Interface">
+            		<DIV class="icone">
+            			<img src="/imagens/api.png"/>
+            		</DIV>
+            		<DIV class="texto">
+            			<p>Acesso a Api</p>
+            		</DIV>
+                </a>
+                <a class="item" href="?logout=1">
+            		<DIV class="icone">
+            			<img src="/imagens/sair.png"/>
+            		</DIV>
+            		<DIV class="texto">
+            			<p>Sair</p>
+            		</DIV>
+                </a>
+            </DIV>
+        </DIV>
+        <DIV id="barraSistemaInf">
+            <span class="descricao">SISTEMA DE REGULA&Ccedil;&Atilde;O</span>
+            <DIV id="detalheUsuario">
+<b>Operador:</b><font color="yellow">&nbsp;PONTES.TATIANESOL&nbsp;</font><b>Perfil:</b><font color="yellow">&nbsp;SOLICITANTE&nbsp;</font><b>Unidade:</b><font color="yellow">&nbsp;SMS CF LOURIVAL FRANCISCO DE OLIVEIRA AP 40 (0214949) </font>		V&nbsp;-&nbsp;3.4.2026.06            </DIV>
+        </DIV>
+<div id="barraMenu">
+	<UL class="sf-menu">
+		<LI class="current"><A href="#" title="" onMouseover="window.status=''; return true;">solicitar&nbsp;&nbsp;</A>
+		<UL class="sf-menu">
+			<LI><A href="/cgi-bin/cadweb50?url=/cgi-bin/marcar" title="Antigo Ambulatorial (Solicitar)" onMouseover="window.status=''; return true;" target="f_principal">Ambulatorial</A>
+			</LI>
+		</UL>
+		</LI>
+		<LI><A href="/cgi-bin/cons_verificar" title="" onMouseover="window.status=''; return true;" target="f_principal">Cancelar Solicitações</A>
+		</LI>
+		<LI class="current"><A href="#" title="" onMouseover="window.status=''; return true;">consulta geral&nbsp;&nbsp;</A>
+		<UL class="sf-menu">
+			<LI><A href="/cgi-bin/cadweb50?standalone=1" title="Consulta de CNS diretamente no CadWeb" onMouseover="window.status=''; return true;" target="f_principal">CNS</A>
+			</LI>
+			<LI><A href="/cgi-bin/cons_unidade" title="Antigo Unidades (Consultas)" onMouseover="window.status=''; return true;" target="f_principal">Unidades</A>
+			</LI>
+			<LI><A href="/cgi-bin/cons_procedimento.pl" title="Novo!" onMouseover="window.status=''; return true;" target="f_principal">Tabela SIGTAP</A>
+			</LI>
+		</UL>
+		</LI>
+		<LI class="current"><A href="#" title="" onMouseover="window.status=''; return true;">consulta amb&nbsp;&nbsp;</A>
+		<UL class="sf-menu">
+			<LI><A href="/cgi-bin/gerenciador_solicitacao" title="Gerenciador de Solicita&ccedil;&otilde;es Ambulatorial" onMouseover="window.status=''; return true;" target="f_principal">Solicita&ccedil;&otilde;es</A>
+			</LI>
+			<LI><A href="/cgi-bin/cons_fila_espera" title="Antigo Marcados pela Fila de Espera (AMB) (Consultas)" onMouseover="window.status=''; return true;" target="f_principal">Agendados pela Fila de Espera</A>
+			</LI>
+			<LI><A href="/cgi-bin/cons_marcados_reg" title="Antigo Marcados pelo Regulador (AMB) (Consultas)" onMouseover="window.status=''; return true;" target="f_principal">Agendados pela Regula&ccedil;&atilde;o</A>
+			</LI>
+			<LI><A href="/cgi-bin/cons_negados_reg" title="Antigo Devolvidos pelo Regulador (AMB) (Consultas)" onMouseover="window.status=''; return true;" target="f_principal">Devolvidos pela Regula&ccedil;&atilde;o</A>
+			</LI>
+			<LI><A href="/cgi-bin/cons_ppi_cotas" title="Antigo Cotas (Consultas)" onMouseover="window.status=''; return true;" target="f_principal">PPI/Cotas</A>
+			</LI>
+			<LI><A href="/cgi-bin/rellst.pl" title="Antigo Ranking (Consultas)" onMouseover="window.status=''; return true;" target="f_principal">Agendamentos/Data Solicita&ccedil;&atilde;o</A>
+			</LI>
+			<LI><A href="/cgi-bin/cons_escalas" title="Antigo Escalas (Consultas)" onMouseover="window.status=''; return true;" target="f_principal">Escalas</A>
+			</LI>
+			<LI><A href="/cgi-bin/cons_pa" title="Antigo Procedimentos (Consultas)" onMouseover="window.status=''; return true;" target="f_principal">Grupos/Procedimentos</A>
+			</LI>
+			<LI><A href="/cgi-bin/cons_prontuario_enviar" title="Novo!" onMouseover="window.status=''; return true;" target="f_principal">Prontuários a Enviar</A>
+			</LI>
+			<LI><A href="/cgi-bin/cons_pendente_fila_" title="Solicitações Pendentes na Fila de Espera" onMouseover="window.status=''; return true;" target="f_principal">Solicitações Pendentes na Fila de Espera</A>
+			</LI>
+			<LI><A href="/cgi-bin/rel_amb_faltas_sol.pl" title="Antigo Faltas por Unidade (Relatórios - Administrativos)" onMouseover="window.status=''; return true;" target="f_principal">Solicitações não confirmadas/Unidade</A>
+			</LI>
+		</UL>
+		</LI>
+	</UL>
+</div>
+               <SCRIPT type="text/javascript">
+                    $(document).ready(function(){
+                        $("ul.sf-menu").supersubs({
+                            minWidth:    12, 
+                            maxWidth:    27, 
+                            extraWidth:  1 
+                        }).superfish(); 
+                    });
+                </SCRIPT>
+        <DIV id="conteudoImage">
+            <DIV id="conteudoFull">
+                <iframe id="f_main" style="z-index: -1;" marginheight="0" marginwidth="1" src="/cgi-bin/avisos" name="f_principal" width="100%" height="100%" frameborder="0" onLoad="" >
+</iframe>
+            </DIV>
+<DIV></DIV>
+
+        </DIV>
+        <DIV id="barraLaranja"></DIV>
+        <DIV id="rodape">
+            <span class="R_esquerda">Departamento de Regula&ccedil;&atilde;o, Avalia&ccedil;&atilde;o e Controle de Sistemas</span>
+            <span class="R_direita"></span>
+        </DIV>
+        <FORM name="formLogin" method="post" action="/">
+<INPUT type="hidden" name="logout" value=""/>
+<INPUT type="hidden" name="msg" value=""/>
+        </FORM>
+</BODY>
+</HTML>
