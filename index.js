@@ -1,12 +1,13 @@
+const express = require('express');
 const axios = require('axios');
 const cheerio = require('cheerio');
+
+const app = express();
 
 const LOGIN_URL = "https://sisregiii.saude.gov.br/";
 const CADWEB_URL = "https://sisregiii.saude.gov.br/cgi-bin/cadweb50";
 const USER = "pontes.tatianesol";
 const PASS_HASH = "30a7fc9ecc375787c8ab8a3350fd70018d9a60ed15f20271abef252b99f3bce1";
-
-// User-Agent atualizado para simular o Chrome mais recente
 const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
 
 async function getSessionCookie() {
@@ -18,7 +19,6 @@ async function getSessionCookie() {
         "logout": ""
     });
 
-    // Adicionamos User-Agent já no login para evitar bloqueio imediato
     const response = await axios.post(LOGIN_URL, data.toString(), {
         headers: { 
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -28,8 +28,7 @@ async function getSessionCookie() {
     });
 
     const cookies = response.headers['set-cookie'];
-    if (!cookies) throw new Error("Não foi possível obter cookies de sessão do servidor");
-    
+    if (!cookies) throw new Error("Não foi possível obter cookies de sessão");
     return cookies.join('; ');
 }
 
@@ -116,7 +115,7 @@ function extrairDados(html) {
     return dados;
 }
 
-module.exports = async (req, res) => {
+app.get("/consulta-cpf", async (req, res) => {
     try {
         const cpfRaw = req.query.cpf;
         if (!cpfRaw) return res.status(400).json({ erro: "CPF não informado" });
@@ -124,10 +123,8 @@ module.exports = async (req, res) => {
         const cpfClean = cpfRaw.replace(/\D/g, "");
         if (cpfClean.length !== 11) return res.status(400).json({ erro: "CPF inválido" });
 
-        // 1. Pega o Cookie de Login
         const cookie = await getSessionCookie();
         
-        // 2. Prepara a requisição de detalhe
         const payload = new URLSearchParams({
             "nu_cns": cpfClean, "nome_paciente": "", "nome_mae": "", "dt_nascimento": "",
             "uf_nasc": "", "mun_nasc": "", "uf_res": "", "mun_res": "", "sexo": "",
@@ -147,14 +144,20 @@ module.exports = async (req, res) => {
 
         const html = response.data;
         if (html.includes("Erro de sincronizacao")) return res.status(500).json({ erro: "Erro de sincronização do SISREG" });
-        if (!html.includes("CONSULTA AO CADASTRO")) return res.status(500).json({ erro: "Paciente não encontrado ou página inesperada" });
+        if (!html.includes("CONSULTA AO CADASTRO")) return res.status(500).json({ erro: "Paciente não encontrado" });
 
         return res.status(200).json(extrairDados(html));
 
     } catch (error) {
-        return res.status(500).json({ 
-            erro: "Falha na execução", 
-            detalhes: error.message 
-        });
+        return res.status(500).json({ erro: "Falha na execução", detalhes: error.message });
     }
-};
+});
+
+// Rota inicial para testar se o servidor está vivo
+app.get("/", (req, res) => res.send("Servidor de Consulta Ativo! Use /consulta-cpf?cpf=..."));
+
+// PORTA DINÂMICA PARA RAILWAY
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
+});
