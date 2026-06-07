@@ -6,6 +6,9 @@ const CADWEB_URL = "https://sisregiii.saude.gov.br/cgi-bin/cadweb50";
 const USER = "pontes.tatianesol";
 const PASS_HASH = "30a7fc9ecc375787c8ab8a3350fd70018d9a60ed15f20271abef252b99f3bce1";
 
+// User-Agent atualizado para simular o Chrome mais recente
+const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
+
 async function getSessionCookie() {
     const data = new URLSearchParams({
         "usuario": USER,
@@ -15,16 +18,18 @@ async function getSessionCookie() {
         "logout": ""
     });
 
-    // Faz o login e captura os cookies do cabeçalho 'set-cookie'
+    // Adicionamos User-Agent já no login para evitar bloqueio imediato
     const response = await axios.post(LOGIN_URL, data.toString(), {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: { 
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'User-Agent': USER_AGENT
+        },
         timeout: 15000
     });
 
     const cookies = response.headers['set-cookie'];
-    if (!cookies) throw new Error("Não foi possível obter cookies de sessão");
+    if (!cookies) throw new Error("Não foi possível obter cookies de sessão do servidor");
     
-    // Retorna os cookies formatados para serem usados no próximo header
     return cookies.join('; ');
 }
 
@@ -131,7 +136,7 @@ module.exports = async (req, res) => {
 
         const response = await axios.post(CADWEB_URL + "?standalone=1", payload.toString(), {
             headers: {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "User-Agent": USER_AGENT,
                 "Cookie": cookie,
                 "Origin": "https://sisregiii.saude.gov.br",
                 "Referer": "https://sisregiii.saude.gov.br/cgi-bin/cadweb50?standalone=1",
